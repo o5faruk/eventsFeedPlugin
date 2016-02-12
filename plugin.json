@@ -3,6 +3,7 @@
   ,"pluginName":"Events Feed"
   ,"pluginDescription":"Easily sync your Google Calendar, Mac Mail Calendar, or any other calendar with an iCal feed to keep your users up to date with your events."
   ,"supportEmail":"support@buildfire.com"
+  , "supportSite":"http://support.appdocumentation.com/knowledge-base/events-feed-plugin/"
   ,"pluginIcon":"icon.png"
   ,"licenseKey": "a4sd6-as654asd6as545a65s4d6a-65asd564a"
   ,"control":{
