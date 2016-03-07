@@ -20,6 +20,6 @@
   ,"widget":{
 
   },
-  "features": [],
+  "features": [{"name" : "Calendar"}],
   "languages": ["en"]
 }
