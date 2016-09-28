@@ -258,8 +258,8 @@
                   result.events[i].days = {}
                 }
 
-                if (result.events[i].formattedRule.byday && !result.events[i].formattedRule.byday) {
-                  switch (new Date(result.events.startDate).getDay()) {
+                if (!result.events[i].formattedRule.byday && !result.events[i].formattedRule.byday) {
+                  switch (new Date(result.events[i].startDate).getDay()) {
                     case 0:
                       result.events[i].days.sunday = true;
                       break;
