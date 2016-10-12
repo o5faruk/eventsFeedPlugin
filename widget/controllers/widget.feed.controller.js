@@ -251,86 +251,15 @@
 
             if (result.events[i].RRULE) {
 
-              var repeat_unit = getRepeatUnit(result.events[i].RRULE.split(';')[0].split('=')[1]);
-
-              if (repeat_unit === "w") {    //daily repeats do not specify day
-                if (!result.events[i].formattedRule.byday) {
-                  result.events[i].days = {}
-                }
-
-                if (!result.events[i].formattedRule.byday && !result.events[i].formattedRule.byday) {
-                  switch (new Date(result.events[i].startDate).getDay()) {
-                    case 0:
-                      result.events[i].days.sunday = true;
-                      break;
-                    case 1:
-                      result.events[i].days.monday = true;
-                      break;
-                    case 2:
-                      result.events[i].days.tuesday = true;
-                      break;
-                    case 3:
-                      result.events[i].days.wednesday = true;
-                      break;
-                    case 4:
-                      result.events[i].days.thursday = true;
-                      break;
-                    case 5:
-                      result.events[i].days.friday = true;
-                      break;
-                    case 6:
-                      result.events[i].days.saturday = true;
-                      break;
-                  }
-
-                  var repeat_days = getRepeatDays(result.events[i].days);
-                } else {
-                  var repeat_days = getRepeatDays(result.events[i].formattedRule.byday);
-                }
-              }
-
-              if (( result.events[i].startDate && result.events[i].formattedRule.until == undefined) && new Date(result.events[i].startDate).getMonth() >= new Date(eventRecEndDate).getMonth()) {
-                recurringEndDate = configureDate.getFullYear() + "-" + moment(configureDate).format("MM") + "-" + WidgetFeed.getLastDateOfMonth(configureDate) + "T00:00:00" + moment(new Date()).format("Z");
-              }
-              var tempDate2 = new Date(result.events[i].startDate);
-              var tempDate = tempDate2.getFullYear() + "-" + moment(tempDate2).format("MM") + "-" + ("0" + tempDate2.getDate()).slice(-2) + "T00:00:00" + moment(new Date()).format("Z");
-              var testdateUntil = (result.events[i].formattedRule.until)
-              if(testdateUntil)
-              testdateUntil = testdateUntil.slice(0,4) + "-" + testdateUntil.slice(4,6) + "-" + testdateUntil.slice(6,8) + "T23:59:59" + moment(new Date()).format("Z");
-              var pattern = {
-                // start: AllEvent?result[i].data.repeat.startDate:+new Date(result[i].data.repeat.startDate) < timeStampInMiliSec && +new Date(result[i].data.startDate) < timeStampInMiliSec? timeStampInMiliSec : result[i].data.repeat.startDate,
-                start: tempDate,
-                every: result.events[i].formattedRule.interval ? result.events[i].formattedRule.interval : 1,
-                unit: repeat_unit,
-                end_condition: 'until',
-                //until: result[i].data.repeat.isRepeating && result[i].data.repeat.endOn ? result[i].data.repeat.endOn : repeat_until,
-                //until: +new Date(eventEndDate) < +new Date(result[i].data.repeat.endOn) || new Date(result[i].data.repeat.endOn)=='Invalid Date'?recurringEndDate:result[i].data.repeat.endOn,
-                until: +new Date(eventRecEndDate) < +new Date(testdateUntil) ? eventRecEndDate : testdateUntil,
-                days: repeat_days
-              };
-              //var a = Number(result.events[i].formattedRule.until)
-
-              if (result.events[i].formattedRule.until == undefined && result.events[i].formattedRule.end !== 'NEVER') {
-                var recurringEndDate = moment(result.events[i].startDate).format('YYYY') + "-" + moment(result.events[i].startDate).format("MM") + "-" + WidgetFeed.getLastDateOfMonth(result.events[i].startDate) + "T00:00:00" + moment(new Date()).format("Z");
-                pattern.until = recurringEndDate;
-              }
-
-              if (result.events[i].formattedRule.freq && result.events[i].formattedRule.until == undefined && result.events[i].formattedRule.end == 'NEVER') {
-                pattern.until = eventRecEndDate;
-              }
-
-              if (result.events[i].formattedRule.end == 'AFTER') {
-                pattern.end_condition = 'for';
-                pattern.rfor = result.events[i].formattedRule.count;
-
-              }
-
-
-
-              //use recurring.js from https://www.npmjs.com/package/recurring-date
-              var r = new RecurringDate(pattern);
-
-              var dates = r.generate();
+               var rruleSet = new RRuleSet();
+              var rrule=rrulestr("RRULE:"+result.events[i].RRULE);
+              //rrule. dtstart=new Date(1900, 10, 30);
+              rruleSet.rrule(rrule);
+              var startDate = new Date();
+              startDate .setMonth(startDate .getMonth() - 1);
+              var endDate = new Date();
+              endDate.setMonth(endDate.getMonth() +1);
+              var dates =  rruleSet.between(startDate, endDate);
 
               //add repeating events to the result
               for (var j = 0; j < dates.length; j++) {
