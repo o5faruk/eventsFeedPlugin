@@ -32,7 +32,7 @@
     })
     .constant('PAGINATION', {
       eventsCount: 10,
-      eventsCountAll:500
+      eventsCountAll:1500
     })
     .constant('PROXY_SERVER', {
       serverUrl: "http://proxy.buildfire.com"
