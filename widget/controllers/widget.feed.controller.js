@@ -253,7 +253,15 @@
 
                var rruleSet = new RRuleSet();
               var rrule=rrulestr("RRULE:"+result.events[i].RRULE);
-              //rrule. dtstart=new Date(1900, 10, 30);
+              if(result.events[i]['DTSTART;VALUE=DATE'])
+              {
+                rrule.options.dtstart = new Date(result.events[i]['DTSTART;VALUE=DATE'].substr(0,4),result.events[i]['DTSTART;VALUE=DATE'].substr(4,2),result.events[i]['DTSTART;VALUE=DATE'].substr(6,2))
+              }
+              else if(result.events[i].DTSTART)
+              {
+                rrule.options.dtstart = new Date(result.events[i].DTSTART.substr(0,4),result.events[i].DTSTART.substr(4,2),result.events[i].DTSTART.substr(6,2));
+              }
+
               rruleSet.rrule(rrule);
               var startDate = new Date();
               startDate .setMonth(startDate .getMonth() - 1);
