@@ -254,12 +254,20 @@
               var rruleSet = new RRuleSet();
               var rrule=rrulestr("RRULE:"+result.events[i].RRULE);
               var strDate="";
-              if(result.events[i]['DTSTART;VALUE=DATE'])
-                strDate = result.events[i]['DTSTART;VALUE=DATE'];
-              else if(result.events[i].DTSTART)
+              if(result.events[i].DTSTART)
                 strDate = result.events[i].DTSTART;
               else
-                continue;//todo: startdate with timezone not handled yet
+              {
+                // the start date may come in different ways , based on timezone ,ex : "DTSTART;TZID=America/Los_Angeles":"20151014T095500"
+                //so just look for a property start with 'DTSTART' , and if not exist skip this event
+                var propertyName =Object.keys(result.events[i]).filter(function(k) {
+                  return k.indexOf('DTSTART') == 0;
+                });
+                if(result.events[i][propertyName])
+                  strDate =result.events[i][propertyName];
+                else
+                  continue;
+              }
 
               var year = parseInt( strDate.substr(0,4));
               var month =parseInt(strDate.substr(4,2)) ;
