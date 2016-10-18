@@ -251,16 +251,20 @@
 
             if (result.events[i].RRULE) {
 
-               var rruleSet = new RRuleSet();
+              var rruleSet = new RRuleSet();
               var rrule=rrulestr("RRULE:"+result.events[i].RRULE);
+              var strDate="";
               if(result.events[i]['DTSTART;VALUE=DATE'])
-              {
-                rrule.options.dtstart = new Date(result.events[i]['DTSTART;VALUE=DATE'].substr(0,4),result.events[i]['DTSTART;VALUE=DATE'].substr(4,2),result.events[i]['DTSTART;VALUE=DATE'].substr(6,2))
-              }
+                strDate = result.events[i]['DTSTART;VALUE=DATE'];
               else if(result.events[i].DTSTART)
-              {
-                rrule.options.dtstart = new Date(result.events[i].DTSTART.substr(0,4),result.events[i].DTSTART.substr(4,2),result.events[i].DTSTART.substr(6,2));
-              }
+                strDate = result.events[i].DTSTART;
+              else
+                continue;//todo: startdate with timezone not handled yet
+
+              var year = parseInt( strDate.substr(0,4));
+              var month =parseInt(strDate.substr(4,2)) ;
+              var day = parseInt(strDate.substr(6,2));
+              rrule.options.dtstart = new Date(year,month-1 ,day);
 
               rruleSet.rrule(rrule);
               var startDate = new Date();
