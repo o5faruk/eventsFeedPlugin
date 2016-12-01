@@ -6,7 +6,7 @@
     <div class="pull-left col-md-8 padding-zero">
       <input type="text" class="form-control" placeholder="Enter Feed"
              ng-model="ContentHome.calUrl"
-             ng-change="ContentHome.clearData()">
+             ng-change="ContentHome.clearData()"/>
     </div>
     <div class="col-md-4 pull-right">
       <button class="btn btn-primary pull-right stretch"
@@ -14,6 +14,9 @@
               ng-disabled="!ContentHome.calUrl">Validate
       </button>
     </div>
+  </div>
+  <div class="main pull-right col-md-9">
+    <span style="font-size: 11px">Note: It is best to use secure websites (<strong>https</strong>) some operating systems require it.</span>
   </div>
   <div class="main pull-right col-md-9">
     <div class="alert alert-sm text-center alert-success margin-top-ten" ng-show="ContentHome.validLinkSuccess">Feed
