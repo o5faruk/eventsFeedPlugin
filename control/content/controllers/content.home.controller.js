@@ -52,7 +52,7 @@
                   if (tmrDelay)clearTimeout(tmrDelay);
                 }
                 else {
-                  var dummyData = {url: "http://ical.mac.com/ical/US32Holidays.ics"};
+                  var dummyData = {url: "https://ical.mac.com/ical/US32Holidays.ics"};
                   ContentHome.data = angular.copy(_data);
                   ContentHome.calUrl  = dummyData.url;
                   updateMasterItem(ContentHome.data);
