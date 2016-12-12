@@ -48,12 +48,19 @@
     }])
     .factory('CalenderFeedApi', ['$q', '$http', 'STATUS_CODE', 'STATUS_MESSAGES', 'PAGINATION', 'PROXY_SERVER',
       function ($q, $http, STATUS_CODE, STATUS_MESSAGES, PAGINATION, PROXY_SERVER) {
+        var isAndroid = function () {
+          var userAgent = navigator.userAgent || navigator.vendor || window.opera;
+          return (/android/i.test(userAgent));
+        };
+        var getProxyServerUrl = function () {
+          return isAndroid() ? PROXY_SERVER.serverUrl : PROXY_SERVER.secureServerUrl;
+        };
         var getSingleEventDetails = function (url, eventIndex, date) {
           var deferred = $q.defer();
           if (!url) {
             deferred.reject(new Error('Undefined feed url'));
           }
-          $http.post(PROXY_SERVER.serverUrl + '/event', {
+          $http.post(getProxyServerUrl()  + '/event', {
             url: url,
             index: eventIndex,
             date: date
@@ -74,9 +81,9 @@
           if (!url) {
             deferred.reject(new Error('Undefined feed url'));
           }
-          $http.post(PROXY_SERVER.serverUrl + '/events', {
+          $http.post(getProxyServerUrl() + '/events', {
             url: url,
-            limit: requestType=='SELECTED'?PAGINATION.eventsCount:PAGINATION.eventsCountAll,
+            limit: requestType == 'SELECTED' ? PAGINATION.eventsCount : PAGINATION.eventsCountAll,
             offset: offset,
             date: date,
             refreshData: refreshData

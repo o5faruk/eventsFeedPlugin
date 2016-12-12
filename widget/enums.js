@@ -35,6 +35,7 @@
       eventsCountAll:1500
     })
     .constant('PROXY_SERVER', {
-      serverUrl: "http://proxy.buildfire.com"
+      serverUrl: "http://proxy.buildfire.com",
+      secureServerUrl: 'https://proxy.buildfire.com'
     });
 })(window.angular);
