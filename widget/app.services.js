@@ -53,6 +53,7 @@
           if (!url) {
             deferred.reject(new Error('Undefined feed url'));
           }
+          var serverUrl = this.isAndroid() ? PROXY_SERVER.serverUrl : PROXY_SERVER.secureServerUrl;
           $http.post(PROXY_SERVER.serverUrl + '/event', {
             url: url,
             index: eventIndex,

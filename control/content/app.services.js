@@ -48,8 +48,7 @@
           if (!url) {
             deferred.reject(new Error('Undefined feed url'));
           }
-          var serverUrl = this.isAndroid() ? PROXY_SERVER.serverUrl : PROXY_SERVER.secureServerUrl;
-          $http.post(PROXY_SERVER.serverUrl + '/validate', {
+          $http.post(this.getProxyServerUrl() + '/validate', {
             url: url
           })
             .success(function (response) {
@@ -67,9 +66,12 @@
         getEvents: function (url) {
 
         },
-        isAndroid: function () {
+        isAndroid: function() {
           var userAgent = navigator.userAgent || navigator.vendor || window.opera;
           return (/android/i.test(userAgent));
+        },
+        getProxyServerUrl: function() {
+          return this.isAndroid() ? PROXY_SERVER.serverUrl : PROXY_SERVER.secureServerUrl;
         }
       }
     }]);
