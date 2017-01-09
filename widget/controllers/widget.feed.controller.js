@@ -245,15 +245,31 @@
         //this function will add repeating events to the result array to the repeat_until date passed in
         var expandRepeatingEvents = function (result, repeat_until, AllEvent) {
           var repeat_results = [];
+          var daysOfWeek = ['SU','MO','TU','WE','TH','FR','SA'];
+
           for (var i = 0; i < result.events.length; i++) {
 
             result.events[i].formattedRule =  getFormatRepeatRule(result.events[i].RRULE)
 
             if (result.events[i].RRULE) {
+                var rruleSuffix = '';
+
+                //Fix for day of week recurrence issue in rrule.js
+                try{
+                    if(result.events[i].RRULE.indexOf("FREQ=WEEKLY") !=-1) {
+                        var startDate = new Date(result.events[i].startDate);
+                        var dayOfWeek = startDate.getDay();
+                        rruleSuffix = ';BYDAY=' + daysOfWeek[dayOfWeek];
+                    }
+                }
+                catch(e){
+                  console.log('day of week', e.message);
+                }
 
               var rruleSet = new RRuleSet();
-              var rrule=rrulestr("RRULE:"+result.events[i].RRULE);
+              var rrule=rrulestr("RRULE:"+result.events[i].RRULE + rruleSuffix);
               var strDate="";
+
               if(result.events[i].DTSTART)
                 strDate = result.events[i].DTSTART;
               else
@@ -269,16 +285,19 @@
                   continue;
               }
 
+
               var year = parseInt( strDate.substr(0,4));
               var month =parseInt(strDate.substr(4,2)) ;
               var day = parseInt(strDate.substr(6,2));
               rrule.options.dtstart = new Date(year,month-1 ,day);
 
               rruleSet.rrule(rrule);
+
               var startDate = new Date();
               startDate .setMonth(startDate .getMonth() - 1);
               var endDate = new Date();
               endDate.setMonth(endDate.getMonth() +1);
+
               var dates =  rruleSet.between(startDate, endDate);
 
               //add repeating events to the result
