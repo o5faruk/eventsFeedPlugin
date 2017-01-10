@@ -249,14 +249,15 @@
 
           for (var i = 0; i < result.events.length; i++) {
 
-            result.events[i].formattedRule =  getFormatRepeatRule(result.events[i].RRULE)
+            result.events[i].formattedRule =  getFormatRepeatRule(result.events[i].RRULE);
 
             if (result.events[i].RRULE) {
                 var rruleSuffix = '';
 
                 //Fix for day of week recurrence issue in rrule.js
                 try{
-                    if(result.events[i].RRULE.indexOf("FREQ=WEEKLY") !=-1) {
+                    if(result.events[i].RRULE.indexOf("FREQ=WEEKLY") != -1 &&
+                        result.events[i].RRULE.indexOf("BYDAY=") == -1) {
                         var startDate = new Date(result.events[i].startDate);
                         var dayOfWeek = startDate.getDay();
                         rruleSuffix = ';BYDAY=' + daysOfWeek[dayOfWeek];
@@ -294,9 +295,9 @@
               rruleSet.rrule(rrule);
 
               var startDate = new Date();
-              startDate .setMonth(startDate .getMonth() - 1);
+              startDate .setMonth(startDate .getMonth() - 12);
               var endDate = new Date();
-              endDate.setMonth(endDate.getMonth() +1);
+              endDate.setMonth(endDate.getMonth() +12);
 
               var dates =  rruleSet.between(startDate, endDate);
 
