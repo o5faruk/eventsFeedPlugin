@@ -111,10 +111,14 @@
             };
             $http.post(getProxyServerUrl() + '/events', postObj).success(function (response) {
                 console.log("got event count: " + new Date());
+                var finalResults = {
+                    events : []
+                };
+                finalResults.events = finalResults.events.concat(response.events);
                 if (response.statusCode == 200) {
                     var promisesList = [];
                     var promiseMinusOne = $q.when();
-                    for (var i = 0; i < response.totalEvents; i += PAGINATION.eventsCountAll) {
+                    for (var i = PAGINATION.eventsCountAll; i < response.totalEvents; i += PAGINATION.eventsCountAll) {
                         //begin IIFE closuse
                         (function (i) {
                             //chain off promiseMinusOne
@@ -141,9 +145,6 @@
                             console.log("call all requests: " + new Date());
                             $q.all(promisesList).then(function(results) {
                                 console.log("got results: " + new Date());
-                                var finalResults = {
-                                    events : []
-                                };
                                 for (var i = 0; i<results.length;i++) {
                                     finalResults.events = finalResults.events.concat(results[i].data.events);
                                 }

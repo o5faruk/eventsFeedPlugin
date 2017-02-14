@@ -61,6 +61,7 @@
               }
           };
           WidgetFeed.eventsAll = null;
+          WidgetFeed.totalCalEvents = null;   //this is all the calendar events from the ics
           WidgetFeed.swiped = [];
           WidgetFeed.data = null;
           WidgetFeed.events = [];
@@ -195,9 +196,6 @@
 
               for (var i = 0; i < result.events.length; i++) {
                   result.events[i].formattedRule =  getFormatRepeatRule(result.events[i].RRULE);
-                  if (result.events[i].SUMMARY == "Women's Prayer Group" || result.events[i].SUMMARY == "Upward Basketball") {
-                      console.log("HERE IT IS at INDEX: " + i);
-                  }
                   if (result.events[i].RRULE) {
                       var rruleSuffix = '';
 
@@ -283,13 +281,14 @@
               Buildfire.spinner.show();
               var successAll = function (resultAll) {
                   console.log("#################", resultAll);
+                  WidgetFeed.totalCalEvents = resultAll;
                   WidgetFeed.eventsAll = [];
                   var repeat_until = getLastDayMonth();
                   resultAll = expandRepeatingEvents(resultAll, repeat_until, true);
 
                   WidgetFeed.eventsAll = resultAll;
                   WidgetFeed.events = resultAll;
-                  Buildfire.spinner.hide();
+
                   $scope.$broadcast('refreshDatepickers');
                   console.log("end getAllEvents: " + new Date());
               }, errorAll = function (errAll) {
@@ -302,11 +301,23 @@
 
           /*This method is used to load the from Datastore*/
           WidgetFeed.loadMore = function (refreshData) {
+              Buildfire.spinner.show();
               if (WidgetFeed.busy) return;
                   WidgetFeed.busy = true;
               if (WidgetFeed.data.content.feedUrl) {
-                  //getFeedEvents(WidgetFeed.data.content.feedUrl, timeStampInMiliSec, refreshData);
-                  WidgetFeed.events = WidgetFeed.eventsAll;
+                  if (WidgetFeed.totalCalEvents) {
+                      var repeat_until = getLastDayMonth();
+                      var resultAll = expandRepeatingEvents(WidgetFeed.totalCalEvents, repeat_until, true);
+                      WidgetFeed.events = resultAll;
+                      WidgetFeed.eventsAll = resultAll;
+                      $scope.$broadcast('refreshDatepickers');
+                      WidgetFeed.offset = WidgetFeed.offset + PAGINATION.eventsCount;
+                      currentLayout = WidgetFeed.data.design.itemDetailsLayout;
+                      WidgetFeed.clickEvent = false;
+                      WidgetFeed.isCalled = true;
+                      $(".glyphicon").css('pointer-events', 'auto');
+                      Buildfire.spinner.hide();
+                  }
               } else {
                   WidgetFeed.eventsAll=[];
               }
