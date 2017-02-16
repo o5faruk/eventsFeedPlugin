@@ -278,7 +278,6 @@
           /*Get all the events for calander dates*/
           WidgetFeed.getAllEvents = function() {
               console.log("start getAllEvents: " + new Date());
-              Buildfire.spinner.show();
               var successAll = function (resultAll) {
                   console.log("#################", resultAll);
                   WidgetFeed.totalCalEvents = resultAll;
