@@ -16,7 +16,7 @@
               console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", result);
               $rootScope.showFeed = false;
               WidgetEvent.event = result;
-              WidgetEvent.event.DESCRIPTION = WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "");
+              WidgetEvent.event.DESCRIPTION = WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), ", ");
             }
             , error = function (err) {
               $rootScope.showFeed = false;
@@ -29,7 +29,7 @@
             $rootScope.showFeed = false;
             WidgetEvent.event = EventCache.getCache();
             if (WidgetEvent.event.DESCRIPTION) {
-              WidgetEvent.event.DESCRIPTION = WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "");
+              WidgetEvent.event.DESCRIPTION = WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), ", ");
             }
           }
           else {
