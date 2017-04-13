@@ -40,7 +40,7 @@
     <div class="text-left padded padding-bottom-zero clearfix text-overlay">
       <p ng-if="WidgetEvent.event.SUMMARY.length>42">{{WidgetEvent.event.SUMMARY}}</p>
       <hr class="small" ng-if="WidgetEvent.event.DESCRIPTION">
-      <p class="break-word">{{WidgetEvent.event.DESCRIPTION}}</p>
+      <p  ng-bind-html="WidgetEvent.event.DESCRIPTION" class="break-word"></p>
       <p class="break-word">{{WidgetEvent.event.LOCATION}}</p>
     </div>
   </div>

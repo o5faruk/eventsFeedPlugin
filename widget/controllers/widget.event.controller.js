@@ -2,8 +2,8 @@
 
 (function (angular, buildfire) {
   angular.module('eventsFeedPluginWidget')
-    .controller('WidgetEventCtrl', ['$scope', 'DataStore', 'TAG_NAMES', 'Location', '$routeParams', 'CalenderFeedApi', 'LAYOUTS', 'Buildfire', '$rootScope', 'EventCache',
-      function ($scope, DataStore, TAG_NAMES, Location, $routeParams, CalenderFeedApi, LAYOUTS, Buildfire, $rootScope, EventCache) {
+    .controller('WidgetEventCtrl', ['$scope', '$sce', 'DataStore', 'TAG_NAMES', 'Location', '$routeParams', 'CalenderFeedApi', 'LAYOUTS', 'Buildfire', '$rootScope', 'EventCache',
+      function ($scope, $sce, DataStore, TAG_NAMES, Location, $routeParams, CalenderFeedApi, LAYOUTS, Buildfire, $rootScope, EventCache) {
         var WidgetEvent = this;
         WidgetEvent.data = null;
         WidgetEvent.event = null;
@@ -16,7 +16,7 @@
               console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", result);
               $rootScope.showFeed = false;
               WidgetEvent.event = result;
-              WidgetEvent.event.DESCRIPTION = WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), ", ");
+              WidgetEvent.event.DESCRIPTION =$sce.trustAsHtml( WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "<br/>"));
             }
             , error = function (err) {
               $rootScope.showFeed = false;
@@ -29,7 +29,7 @@
             $rootScope.showFeed = false;
             WidgetEvent.event = EventCache.getCache();
             if (WidgetEvent.event.DESCRIPTION) {
-              WidgetEvent.event.DESCRIPTION = WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), ", ");
+              WidgetEvent.event.DESCRIPTION = $sce.trustAsHtml( WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "<br/>"));
             }
           }
           else {
