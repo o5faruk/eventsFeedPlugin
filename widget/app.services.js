@@ -49,7 +49,7 @@
     .factory('CalenderFeedApi', ['$q', '$http', 'STATUS_CODE', 'STATUS_MESSAGES', 'PAGINATION', 'PROXY_SERVER',
       function ($q, $http, STATUS_CODE, STATUS_MESSAGES, PAGINATION, PROXY_SERVER) {
         var getProxyServerUrl = function () {
-          return PROXY_SERVER.secureServerUrl;
+          return PROXY_SERVER.serverUrl;
         };
         var getSingleEventDetails = function (url, eventIndex, date) {
           var deferred = $q.defer();

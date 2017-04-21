@@ -191,11 +191,13 @@
           };
           //this function will add repeating events to the result array to the repeat_until date passed in
           var expandRepeatingEvents = function (result, repeat_until, AllEvent) {
+
               var repeat_results = [];
               var daysOfWeek = ['SU','MO','TU','WE','TH','FR','SA'];
 
               for (var i = 0; i < result.events.length; i++) {
                   result.events[i].formattedRule =  getFormatRepeatRule(result.events[i].RRULE);
+                  console.log(result.events[i].SUMMARY);
                   if (result.events[i].RRULE) {
                       var rruleSuffix = '';
 
@@ -211,7 +213,6 @@
                       }
 
                       var rruleSet = new RRuleSet();
-                      var rrule=rrulestr("RRULE:"+result.events[i].RRULE + rruleSuffix);
                       var strDate="";
                       if(result.events[i].DTSTART)
                           strDate = result.events[i].DTSTART;
@@ -229,13 +230,38 @@
                       var year = parseInt( strDate.substr(0,4));
                       var month =parseInt(strDate.substr(4,2)) ;
                       var day = parseInt(strDate.substr(6,2));
-                      rrule.options.dtstart = new Date(year,month-1 ,day);
+                      var hour=parseInt(strDate.substr(9,2));
+                      var minute=parseInt(strDate.substr(11,2));
+                      var second=parseInt(strDate.substr(13,2));
+                      console.log(result.events[i].RRULE);
+                      var rrule=rrulestr("RRULE:"+result.events[i].RRULE + rruleSuffix, {dtstart: new Date(year,month-1 ,day, hour, minute, second)});
+
                       rruleSet.rrule(rrule);
                       var startDate = new Date();
                       startDate.setMonth(startDate.getMonth() - 12);
                       var endDate = new Date();
                       endDate.setMonth(endDate.getMonth() +12);
+                      //exclude dates if they have them in events
+                      var propertyName =Object.keys(result.events[i]).filter(function(k) {
+                          return k.indexOf('EXDATE') == 0;
+                      });
+                      var exdates = [];
+
+                      if(result.events[i][propertyName]) {
+                          exdates = result.events[i][propertyName]
+                      }
+                      //if there is only one exdate, it is not an array ... great
+                      if(!Array.isArray(exdates)) {
+                          exdates = [exdates];
+                      }
+                      for (var j=0;j<exdates.length;j++) {
+                          var exDateStr = exdates[j];
+                          var exDate = new Date(exDateStr.substr(0,4), exDateStr.substr(4,2)-1, exDateStr.substr(6,2), exDateStr.substr(9,2), exDateStr.substr(11,2), exDateStr.substr(13,2) )
+                          rruleSet.exdate(exDate);
+                      }
+                      var mTest = rruleSet.valueOf();
                       var dates =  rruleSet.between(startDate, endDate);
+                      console.log(mTest);
                       //add repeating events to the result
                       for (var j = 0; j < dates.length; j++) {
                           var temp_result = JSON.parse(JSON.stringify(result.events[i]));
@@ -259,8 +285,8 @@
                               repeat_results.push(result.events[i]);
                           }
                       }
-                  }
-              }
+
+              }}
               //sort the list by start date
               repeat_results.sort(function (a, b) {
                   if (a.startDate > b.startDate) {
