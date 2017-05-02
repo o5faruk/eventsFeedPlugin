@@ -16,7 +16,7 @@
               console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", result);
               $rootScope.showFeed = false;
               WidgetEvent.event = result;
-              WidgetEvent.event.DESCRIPTION =$sce.trustAsHtml( WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "<br/>"));
+            $scope.eventDescription =$sce.trustAsHtml( WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "<br/>"));
             }
             , error = function (err) {
               $rootScope.showFeed = false;
@@ -29,7 +29,7 @@
             $rootScope.showFeed = false;
             WidgetEvent.event = EventCache.getCache();
             if (WidgetEvent.event.DESCRIPTION) {
-              WidgetEvent.event.DESCRIPTION = $sce.trustAsHtml( WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "<br/>"));
+              $scope.eventDescription = $sce.trustAsHtml( WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "<br/>"));
             }
           }
           else {
