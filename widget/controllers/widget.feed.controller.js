@@ -479,15 +479,13 @@
               timeStampInMiliSec = +new Date(formattedDate);
               if (!WidgetFeed.clickEvent) {
                   if ($rootScope.chnagedMonth == undefined) {
-                      configureDate = new Date();
-                      eventStartDate = configureDate.getFullYear() + "-" + moment(configureDate).format("MM") + "-" + WidgetFeed.getFirstDateOfMonth(configureDate) + "T00:00:00" + moment(new Date()).format("Z");
-                      eventRecEndDate = configureDate.getFullYear() + "-" + moment(configureDate).format("MM") + "-" + WidgetFeed.getLastDateOfMonth(configureDate) + "T23:59:59" + moment(new Date()).format("Z");
-                      WidgetFeed.calledDate = +new Date(configureDate.getFullYear() + "-" + moment(configureDate).format("MM") + "-01" + "T00:00:00" + moment(new Date()).format("Z"));
+                      eventStartDate = formattedDate;
+                      var tempDt = new Date(eventStartDate);
+                      eventRecEndDate = new Date(tempDt.setTime( tempDt.getTime() + 1 * 86399999 ));
                       WidgetFeed.clickEvent = true;
                       WidgetFeed.events = null;
                       WidgetFeed.busy = false;
                       WidgetFeed.disabled = true;
-                      WidgetFeed.calledDate = timeStampInMiliSec;
                       $(".glyphicon").css('pointer-events', 'none');
                       WidgetFeed.loadMore();
                   } else {
