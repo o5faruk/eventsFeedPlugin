@@ -234,7 +234,13 @@
                       var minute=parseInt(strDate.substr(11,2));
                       var second=parseInt(strDate.substr(13,2));
                       console.log(result.events[i].RRULE);
-                      var rrule=rrulestr("RRULE:"+result.events[i].RRULE + rruleSuffix, {dtstart: new Date(year,month-1 ,day, hour, minute, second)});
+                      //make sure the start date is valid
+                      var dtStart = new Date(year,month-1 ,day, hour, minute, second);
+                      if ( dtStart == "Invalid Date" ) {
+                          console.log("Invalid Start Date for :", result.events[i].SUMMARY)
+                          continue;
+                      }
+                      var rrule=rrulestr("RRULE:"+result.events[i].RRULE + rruleSuffix, {dtstart:dtStart});
 
                       rruleSet.rrule(rrule);
                       var startDate = new Date();
@@ -245,6 +251,7 @@
                       var propertyName =Object.keys(result.events[i]).filter(function(k) {
                           return k.indexOf('EXDATE') == 0;
                       });
+                      
                       var exdates = [];
 
                       if(result.events[i][propertyName]) {
@@ -259,6 +266,7 @@
                           var exDate = new Date(exDateStr.substr(0,4), exDateStr.substr(4,2)-1, exDateStr.substr(6,2), exDateStr.substr(9,2), exDateStr.substr(11,2), exDateStr.substr(13,2) )
                           rruleSet.exdate(exDate);
                       }
+                      
                       var mTest = rruleSet.valueOf();
                       var dates =  rruleSet.between(startDate, endDate);
                       console.log(mTest);
