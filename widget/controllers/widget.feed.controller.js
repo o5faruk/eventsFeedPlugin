@@ -284,7 +284,9 @@
                       }
                   } else {
                       //save the result even if it is not repeating.
-
+                      if(result.events[i].isAllDay && result.events[i]["DTSTART;VALUE=DATE"]) {
+                          result.events[i].startDate = moment(result.events[i]["DTSTART;VALUE=DATE"], 'YYYYMMDD').toDate();
+                      }
                       if (result.events[i].startDate >= +new Date(eventStartDate) && result.events[i].startDate <= +new Date(eventRecEndDate)) {
                           result.events[i].tmpStartDate = result.events[i].startDate;
                           if (AllEvent)
