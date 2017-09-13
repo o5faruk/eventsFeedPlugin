@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "This Buildfire plugin allows user to add their calender events in feed mode:",
   "main": "index.js",
+  "supportSite":"http://learn.appdocumentation.com/plugin-tutorials/events-feed-plugin-tutorial",
   "scripts": {
     "postinstall": "./node_modules/.bin/bower install",
     "test": "./node_modules/.bin/karma start --single-run --browsers PhantomJS"
