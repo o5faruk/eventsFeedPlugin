@@ -344,7 +344,8 @@
                       var repeat_until = getLastDayMonth();
                       var resultAll = expandRepeatingEvents(WidgetFeed.totalCalEvents, repeat_until, true);
                       WidgetFeed.events = resultAll;
-                    //  WidgetFeed.eventsAll = resultAll;
+                      if(refreshData && refreshData ==true)
+                          WidgetFeed.eventsAll = resultAll;
                       $scope.$broadcast('refreshDatepickers');
                       WidgetFeed.offset = WidgetFeed.offset + PAGINATION.eventsCount;
                       currentLayout = WidgetFeed.data.design.itemDetailsLayout;
@@ -497,7 +498,7 @@
                       WidgetFeed.busy = false;
                       WidgetFeed.disabled = true;
                       $(".glyphicon").css('pointer-events', 'none');
-                      WidgetFeed.loadMore();
+                      WidgetFeed.loadMore(false);
                   } else {
                       configureDate = new Date($rootScope.chnagedMonth);
                       eventStartDate = configureDate.getFullYear() + "-" + moment(configureDate).format("MM") + "-" + WidgetFeed.getFirstDateOfMonth(configureDate) + "T00:00:00" + moment(new Date()).format("Z");
@@ -514,7 +515,7 @@
                       WidgetFeed.disabled = true;
                       WidgetFeed.calledDate = timeStampInMiliSec;
                       $(".glyphicon").css('pointer-events', 'none');
-                      WidgetFeed.loadMore();
+                      WidgetFeed.loadMore(true);
                   }
               }
           };
