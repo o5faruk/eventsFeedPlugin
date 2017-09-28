@@ -344,7 +344,7 @@
                       var repeat_until = getLastDayMonth();
                       var resultAll = expandRepeatingEvents(WidgetFeed.totalCalEvents, repeat_until, true);
                       WidgetFeed.events = resultAll;
-                      WidgetFeed.eventsAll = resultAll;
+                    //  WidgetFeed.eventsAll = resultAll;
                       $scope.$broadcast('refreshDatepickers');
                       WidgetFeed.offset = WidgetFeed.offset + PAGINATION.eventsCount;
                       currentLayout = WidgetFeed.data.design.itemDetailsLayout;
