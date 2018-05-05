@@ -334,7 +334,7 @@
               CalenderFeedApi.getFeedEvents(WidgetFeed.data.content.feedUrl, eventFromDate, 0, true, 'ALL').then(successAll, errorAll);
           };
 
-          /*This method is used to load the from Datastore*/
+          /*This method is used to load the events from the selected month*/
           WidgetFeed.loadMore = function (refreshData) {
               Buildfire.spinner.show();
               if (WidgetFeed.busy) return;
