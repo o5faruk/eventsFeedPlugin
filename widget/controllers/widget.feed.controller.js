@@ -392,6 +392,7 @@
                       WidgetFeed.offset = 0;
                       WidgetFeed.busy = false;
                       WidgetFeed.eventClassToggle = true;
+                      WidgetFeed.getAllEvents();
                       WidgetFeed.loadMore(false);
                   }
                   $scope.$broadcast('refreshDatepickers');
