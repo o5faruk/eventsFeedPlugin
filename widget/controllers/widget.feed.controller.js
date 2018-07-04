@@ -121,6 +121,10 @@
               DataStore.get(TAG_NAMES.EVENTS_FEED_INFO).then(success, error);
           };
 
+          WidgetFeed.toISOString = function(date) {
+            return moment(date).utc().format('MMM D, YYYY');
+          }
+
           //returns the last day of the month based on current date
           var getLastDayMonth = function () {
               var month = currentDate.getMonth();
@@ -251,7 +255,7 @@
                       var propertyName =Object.keys(result.events[i]).filter(function(k) {
                           return k.indexOf('EXDATE') == 0;
                       });
-                      
+
                       var exdates = [];
 
                       if(result.events[i][propertyName]) {
@@ -266,7 +270,7 @@
                           var exDate = new Date(exDateStr.substr(0,4), exDateStr.substr(4,2)-1, exDateStr.substr(6,2), exDateStr.substr(9,2), exDateStr.substr(11,2), exDateStr.substr(13,2) )
                           rruleSet.exdate(exDate);
                       }
-                      
+
                       var mTest = rruleSet.valueOf();
                       var dates =  rruleSet.between(startDate, endDate);
                       console.log(mTest);
@@ -316,6 +320,14 @@
               console.log("start getAllEvents: " + new Date());
               var successAll = function (resultAll) {
                   console.log("#################", resultAll);
+
+                  resultAll.events.forEach(elem => {
+                    if (elem.SUMMARY === "Spring Break") {
+                      elem['DTEND;VALUE=DATE'] = "20180408";
+                      console.warn(elem);
+                    }
+                  })
+
                   WidgetFeed.totalCalEvents = resultAll;
                   WidgetFeed.eventsAll = [];
                   var repeat_until = getLastDayMonth();
