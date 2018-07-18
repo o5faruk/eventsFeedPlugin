@@ -56,7 +56,6 @@
           }
         };
 
-
         WidgetEvent.setAddedEventToLocalStorage = function (eventId) {
           var addedEvents = [];
           addedEvents = JSON.parse(localStorage.getItem('localAddedEventsFeed'));
