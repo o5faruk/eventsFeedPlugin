@@ -10,7 +10,7 @@ var express = require('express');
 var app = express(),
   bodyParser = require('body-parser'),
   request = require('request'),
-  ical2json = require("ical2json"),
+  ical2json = require("./icalParser"),
   dateParser = require("./Utils"),
   async = require("async");
 
@@ -32,9 +32,9 @@ var allowCrossDomain = function (req, res, next) {
 
 app.use(allowCrossDomain);
 // Parsing json and urlencoded requests
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(bodyParser.json({type: 'application/vnd.api+json'}));
+app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
 
 app.get('/', function (req, res) {
   res.send("Server running...");
@@ -48,14 +48,14 @@ app.post('/validate', function (req, res) {
       if (!error && response.statusCode == 200) {
         var data = ical2json.convert(body);
         if (data && data.VEVENT && data.VEVENT.length)
-          res.send({'statusCode': 200});
+          res.send({ 'statusCode': 200 });
         else
-          res.send({'statusCode': 404});
+          res.send({ 'statusCode': 404 });
       } else
-        res.send({'statusCode': 500});
+        res.send({ 'statusCode': 500 });
     });
   } else
-    res.send({'statusCode': 404});
+    res.send({ 'statusCode': 404 });
 });
 
 
@@ -67,7 +67,7 @@ app.post('/events', function (req, res) {
   var isSyncThresholdCrossed = ((currentTime - Last_EVENT_SYNC_TIME) >= (1000 * 60 * 60 * 24));
   var paginatedListOfEvents = [];
 
-  if(isSyncThresholdCrossed) {
+  if (isSyncThresholdCrossed) {
     Last_EVENT_SYNC_TIME = currentTime;
   }
 
@@ -95,7 +95,9 @@ app.post('/events', function (req, res) {
         if (!error && response.statusCode == 200) {
           var data = ical2json.convert(body);
           if (data && data.VEVENT && data.VEVENT.length) {
-            var mergedEvents = data.VCALENDAR[0].VEVENT.concat(data.VEVENT);
+            var mergedEvents
+            if (data && data.VCALENDAR && data.VCALENDAR[0] && data.VCALENDAR[0].VEVENT) mergedEvents = data.VCALENDAR[0].VEVENT.concat(data.VEVENT)
+            else mergedEvents = data.VEVENT
             processData(mergedEvents, function (events) {
               mergedEvents = events;
               mergedEvents = mergedEvents.sort(function (a, b) {
@@ -121,13 +123,13 @@ app.post('/events', function (req, res) {
             });
           }
           else
-            res.send({'statusCode': 404, 'events': null});
+            res.send({ 'statusCode': 404, 'events': null });
         } else
-          res.send({'statusCode': 500, 'events': null});
+          res.send({ 'statusCode': 500, 'events': null });
       });
     }
   } else
-    res.send({'statusCode': 404, 'events': null});
+    res.send({ 'statusCode': 404, 'events': null });
 });
 
 
@@ -137,7 +139,7 @@ app.post('/event', function (req, res) {
   var index = req.body.index || 0;
   var isSyncThresholdCrossed = ((currentTime - Last_EVENT_SYNC_TIME) >= (1000 * 60 * 60 * 24));
 
-  if(isSyncThresholdCrossed) {
+  if (isSyncThresholdCrossed) {
     Last_EVENT_SYNC_TIME = currentTime;
   }
 
@@ -146,9 +148,9 @@ app.post('/event', function (req, res) {
       returnEventIndexFromCurrentDate(EVENTS_DATA[req.body.url], req.body.date, function (indexOfCurrentDateEvent) {
         if (index != -1) {
           var event = EVENTS_DATA[req.body.url][Number(index) + indexOfCurrentDateEvent];
-          res.send({'statusCode': 200, 'event': event});
+          res.send({ 'statusCode': 200, 'event': event });
         } else {
-          res.send({'statusCode': 404, 'event': null});
+          res.send({ 'statusCode': 404, 'event': null });
         }
       });
     }
@@ -167,21 +169,21 @@ app.post('/event', function (req, res) {
               returnEventIndexFromCurrentDate(mergedEvents, req.body.date, function (indexOfCurrentDateEvent) {
                 if (index != -1) {
                   var event = mergedEvents[Number(index) + indexOfCurrentDateEvent];
-                  res.send({'statusCode': 200, 'event': event});
+                  res.send({ 'statusCode': 200, 'event': event });
                 } else {
-                  res.send({'statusCode': 404, 'event': null});
+                  res.send({ 'statusCode': 404, 'event': null });
                 }
               });
             });
           }
           else
-            res.send({'statusCode': 404, 'event': null});
+            res.send({ 'statusCode': 404, 'event': null });
         } else
-          res.send({'statusCode': 500, 'event': null});
+          res.send({ 'statusCode': 500, 'event': null });
       });
     }
   } else
-    res.send({'statusCode': 404, 'event': null});
+    res.send({ 'statusCode': 404, 'event': null });
 });
 
 var server = app.listen(3020, function () {
