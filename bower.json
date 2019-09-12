@@ -17,6 +17,7 @@
     "angular-route": "~1.4.3",
     "tinymce": "~4.2.3",
     "owlcarousel": "./bower_obsolete/",
-    "angular-bootstrap": "~0.13.3"
+    "angular-bootstrap": "~0.13.3",
+    "autolinker.js": "Autolinker.js#^3.11.0"
   }
 }
