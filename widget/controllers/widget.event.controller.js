@@ -34,8 +34,10 @@
                 //removes target and rel attributes so that links can be clickable
                 replaceFn: function (match) {
                   var tag = match.buildTag();
-                  tag.setAttr("target", null);
-                  tag.setAttr("rel", null);
+                  if(tag && tag.attrs){
+                    delete tag.attrs.rel;
+                    delete tag.attrs.target;
+                  }
                   return tag;
                 }
               });
