@@ -10,14 +10,14 @@
         var currentListLayout = null;
         $rootScope.deviceHeight = window.innerHeight;
         $rootScope.deviceWidth = window.innerWidth || 320;
-        $rootScope.backgroundImage="";
+        $rootScope.backgroundImage = "";
         var getEventDetails = function (url) {
           var success = function (result) {
-              console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", result);
-              $rootScope.showFeed = false;
-              WidgetEvent.event = result;
-            $scope.eventDescription =$sce.trustAsHtml( WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "<br/>"));
-            }
+            console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", result);
+            $rootScope.showFeed = false;
+            WidgetEvent.event = result;
+            $scope.eventDescription = $sce.trustAsHtml(WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "<br/>"));
+          }
             , error = function (err) {
               $rootScope.showFeed = false;
               console.error('Error In Fetching events', err);
@@ -29,7 +29,9 @@
             $rootScope.showFeed = false;
             WidgetEvent.event = EventCache.getCache();
             if (WidgetEvent.event.DESCRIPTION) {
-              $scope.eventDescription = $sce.trustAsHtml( WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "<br/>"));
+              let description = WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "<br/>");
+              var linkedText = Autolinker.link(description);
+              $scope.eventDescription = $sce.trustAsHtml(linkedText);
             }
           }
           else {
@@ -165,10 +167,9 @@
             }
 
             currentListLayout = WidgetEvent.data.design.itemDetailsLayout;
-            if(WidgetEvent.data.design.itemDetailsBgImage){
+            if (WidgetEvent.data.design.itemDetailsBgImage) {
               $rootScope.backgroundImage = WidgetEvent.data.design.itemDetailsBgImage;
-            }else
-            {
+            } else {
               $rootScope.backgroundImage = "";
             }
             $scope.imagesUpdated = !!event.data.content;
@@ -182,34 +183,33 @@
          */
         var init = function () {
           var success = function (result) {
-              if (result.data && result.id) {
-                WidgetEvent.data = result.data;
-                if (!WidgetEvent.data.design)
-                  WidgetEvent.data.design = {};
-                if (!WidgetEvent.data.content)
-                  WidgetEvent.data.content = {};
-                if (!WidgetEvent.data.design.itemDetailsLayout) {
-                  WidgetEvent.data.design.itemDetailsLayout = LAYOUTS.itemDetailsLayout[0].name;
-                }
-                if(WidgetEvent.data.design.itemDetailsBgImage){
-                  $rootScope.backgroundImage = WidgetEvent.data.design.itemDetailsBgImage;
-                }
-                else
-                {
-                  $rootScope.backgroundImage = "";
-                }
-                getEventDetails(WidgetEvent.data.content.feedUrl);
-              } else {
-                WidgetEvent.data = {
-                  content: {},
-                  design: {}
-                };
-                var dummyData = {url: "http://ical.mac.com/ical/US32Holidays.ics"};
-                WidgetEvent.data.content.feedUrl = dummyData.url;
+            if (result.data && result.id) {
+              WidgetEvent.data = result.data;
+              if (!WidgetEvent.data.design)
+                WidgetEvent.data.design = {};
+              if (!WidgetEvent.data.content)
+                WidgetEvent.data.content = {};
+              if (!WidgetEvent.data.design.itemDetailsLayout) {
                 WidgetEvent.data.design.itemDetailsLayout = LAYOUTS.itemDetailsLayout[0].name;
-                getEventDetails(WidgetEvent.data.content.feedUrl);
               }
+              if (WidgetEvent.data.design.itemDetailsBgImage) {
+                $rootScope.backgroundImage = WidgetEvent.data.design.itemDetailsBgImage;
+              }
+              else {
+                $rootScope.backgroundImage = "";
+              }
+              getEventDetails(WidgetEvent.data.content.feedUrl);
+            } else {
+              WidgetEvent.data = {
+                content: {},
+                design: {}
+              };
+              var dummyData = { url: "http://ical.mac.com/ical/US32Holidays.ics" };
+              WidgetEvent.data.content.feedUrl = dummyData.url;
+              WidgetEvent.data.design.itemDetailsLayout = LAYOUTS.itemDetailsLayout[0].name;
+              getEventDetails(WidgetEvent.data.content.feedUrl);
             }
+          }
             , error = function (err) {
               console.error('Error while getting data', err);
             };
