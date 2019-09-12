@@ -30,7 +30,15 @@
             WidgetEvent.event = EventCache.getCache();
             if (WidgetEvent.event.DESCRIPTION) {
               let description = WidgetEvent.event.DESCRIPTION.replace(new RegExp("\\\\;", "g"), ";").replace(new RegExp("\\\\,", "g"), ",").replace(new RegExp("\\\\n", "g"), "<br/>");
-              var linkedText = Autolinker.link(description);
+              var linkedText = Autolinker.link(description, {
+                //removes target and rel attributes so that links can be clickable
+                replaceFn: function (match) {
+                  var tag = match.buildTag();
+                  tag.setAttr("target", null);
+                  tag.setAttr("rel", null);
+                  return tag;
+                }
+              });
               $scope.eventDescription = $sce.trustAsHtml(linkedText);
             }
           }
