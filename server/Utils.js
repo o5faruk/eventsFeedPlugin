@@ -21,6 +21,9 @@ module.exports = function (eventObj) {
             endKey += (";" + startDateComponents[1]);
           }
           var compsEnd = /^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})(Z)?$/.exec(eventObj[endKey]);
+          if(!compsEnd)
+            compsEnd = compsStart;
+          
           if (compsStart !== null) {
             if (compsStart[7] == 'Z') { // GMT
               eventObj["startDate"] = +new Date(Date.UTC(
