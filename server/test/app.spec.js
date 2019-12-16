@@ -39,7 +39,7 @@ describe('Server API Test Suite', function () {
     it('res.statusCode should be 200', function (done) {
       request(app)
         .post("/validate")
-        .send({'url': 'http://www.google.com/calendar/ical/49jqotgq8bcgt06tj7040hk2mk%40group.calendar.google.com/public/basic.ics'})
+        .send({'url': 'https://calendar.google.com/calendar/ical/dchccn76jfr4obfve6ssk78aik%40group.calendar.google.com/public/basic.ics'})
         .end(function (err, res) {
           assert.equal(200, JSON.parse(res.text).statusCode);
           done();
@@ -74,7 +74,7 @@ describe('Server API Test Suite', function () {
     it('res.statusCode should be 200 and array of events', function (done) {
       request(app)
         .post("/events")
-        .send({'url': 'http://www.google.com/calendar/ical/49jqotgq8bcgt06tj7040hk2mk%40group.calendar.google.com/public/basic.ics'})
+        .send({'url': 'https://calendar.google.com/calendar/ical/dchccn76jfr4obfve6ssk78aik%40group.calendar.google.com/public/basic.ics'})
         .end(function (err, res) {
           assert.equal(200, JSON.parse(res.text).statusCode);
           assert.isArray(JSON.parse(res.text).events, "Events list should be an array");
@@ -113,8 +113,8 @@ describe('Server API Test Suite', function () {
       request(app)
         .post("/event")
         .send({
-          'url': 'http://www.google.com/calendar/ical/49jqotgq8bcgt06tj7040hk2mk%40group.calendar.google.com/public/basic.ics',
-          'index': 1
+          'url': 'https://calendar.google.com/calendar/ical/dchccn76jfr4obfve6ssk78aik%40group.calendar.google.com/public/basic.ics',
+          'index': 0
         })
         .end(function (err, res) {
           assert.equal(200, JSON.parse(res.text).statusCode);
