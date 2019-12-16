@@ -31,6 +31,6 @@
       ]
     })
     .constant('PROXY_SERVER', {
-      serverUrl: "https://proxy.buildfire.com"
+      serverUrl: "https://faruktesting.tk"
     });
 })(window.angular);

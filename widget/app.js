@@ -57,7 +57,7 @@
       };
     })
     .filter('getTimeZone', function () {
-
+      
       return function (input) {
         input = new Date(input);
         var result = input.toString().match(/\((.+)\)/i);

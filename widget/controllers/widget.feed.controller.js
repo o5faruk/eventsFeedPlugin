@@ -199,6 +199,11 @@
               var repeat_results = [];
               var daysOfWeek = ['SU','MO','TU','WE','TH','FR','SA'];
 
+              result.events.forEach(event => {
+                event.startDate = + new Date(event.startDate);
+                event.endDate = + new Date(event.endDate);
+              });
+
               for (var i = 0; i < result.events.length; i++) {
                   result.events[i].formattedRule =  getFormatRepeatRule(result.events[i].RRULE);
                   console.log(result.events[i].SUMMARY);
@@ -287,7 +292,6 @@
                               }
                       }
                   } else {
-                      //save the result even if it is not repeating.
                       if(result.events[i].isAllDay && result.events[i]["DTSTART;VALUE=DATE"]) {
                           result.events[i].startDate = moment(result.events[i]["DTSTART;VALUE=DATE"], 'YYYYMMDD').toDate();
                       }
