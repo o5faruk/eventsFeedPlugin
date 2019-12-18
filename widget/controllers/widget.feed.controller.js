@@ -60,7 +60,23 @@
                    ]
               }
           };
-          WidgetFeed.eventsAll = null;
+          const getTimeFromTimeZone = (event,start) => {
+            try {
+                const keyWord = start ? "DTSTART;TZID":"DTEND;TZID";
+                let dtTZID = null;
+                Object.entries(event).forEach(([key, value]) => { if (key.indexOf(keyWord) >= 0) { dtTZID = key + ":" + value } });
+                if (dtTZID) {
+                    const dtStartTimeRaw = dtTZID.split(':')[1];
+                    const comps = /^(\d{4})(\d{2})(\d{2})(T)(\d{2})(\d{2})(\d{2})$/.exec(dtStartTimeRaw);
+                    const dtStartTimeString = comps[1] + '-' + comps[2] + '-' + comps[3] + " " + comps[5] + ':' + comps[6] + ':' + comps[7];
+                    return moment.tz(dtStartTimeString, dtTZID.split('"')[1]).local().toDate();
+                }
+            } catch (err) {
+                console.error(err)
+                return null;
+            }
+          };
+         WidgetFeed.eventsAll = null;
           WidgetFeed.totalCalEvents = null;   //this is all the calendar events from the ics
           WidgetFeed.swiped = [];
           WidgetFeed.data = null;
@@ -289,8 +305,18 @@
                   } else {
                       //save the result even if it is not repeating.
                       if(result.events[i].isAllDay && result.events[i]["DTSTART;VALUE=DATE"]) {
-                          result.events[i].startDate = moment(result.events[i]["DTSTART;VALUE=DATE"], 'YYYYMMDD').toDate();
+                        result.events[i].startDate = moment(result.events[i]["DTSTART;VALUE=DATE"], 'YYYYMMDD').toDate();
                       }
+                      const startDateFromTimeZone = getTimeFromTimeZone(result.events[i],true);
+                      if(startDateFromTimeZone){
+                          result.events[i].startDate = startDateFromTimeZone;
+                      }
+
+                      const endDateFromTimeZone = getTimeFromTimeZone(result.events[i],false);
+                      if(endDateFromTimeZone){
+                          result.events[i].endDate = endDateFromTimeZone;
+                      }
+                    
                       if (result.events[i].startDate >= +new Date(eventStartDate) && result.events[i].startDate <= +new Date(eventRecEndDate)) {
                           result.events[i].tmpStartDate = result.events[i].startDate;
                           if (AllEvent)
