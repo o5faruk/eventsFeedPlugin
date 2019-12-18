@@ -10,7 +10,7 @@ var express = require('express');
 var app = express(),
   bodyParser = require('body-parser'),
   request = require('request'),
-  ical2json = require("ical2json"),
+  ical2json = require("./icalParser"),
   dateParser = require("./Utils"),
   async = require("async");
 
@@ -32,9 +32,9 @@ var allowCrossDomain = function (req, res, next) {
 
 app.use(allowCrossDomain);
 // Parsing json and urlencoded requests
-app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(bodyParser.json({type: 'application/vnd.api+json'}));
+app.use(bodyParser.json({ type: 'application/vnd.api+json' }));
 
 app.get('/', function (req, res) {
   res.send("Server running...");
@@ -43,19 +43,24 @@ app.get('/', function (req, res) {
 
 // API to validate ical url
 app.post('/validate', function (req, res) {
-  if (req.body.url) {
-    request(req.body.url, function (error, response, body) {
+  let { url } = req.body
+  if (url[0] === "w") {
+    url = url.replace("webcal", "https");
+  }
+  if (url) {
+    request(url, function (error, response, body) {
       if (!error && response.statusCode == 200) {
         var data = ical2json.convert(body);
-        if (data && data.VEVENT && data.VEVENT.length)
-          res.send({'statusCode': 200});
+        let mergedEvents = mergeEvents(data);
+        if (mergedEvents)
+          res.send({ 'statusCode': 200, events: mergedEvents.length > 0 ? true : false });
         else
-          res.send({'statusCode': 404});
+          res.send({ 'statusCode': 404 });
       } else
-        res.send({'statusCode': 500});
+        res.send({ 'statusCode': response.statusCode });
     });
   } else
-    res.send({'statusCode': 404});
+    res.send({ 'statusCode': 404 });
 });
 
 
@@ -67,67 +72,53 @@ app.post('/events', function (req, res) {
   var isSyncThresholdCrossed = ((currentTime - Last_EVENT_SYNC_TIME) >= (1000 * 60 * 60 * 24));
   var paginatedListOfEvents = [];
 
-  if(isSyncThresholdCrossed) {
+  if (isSyncThresholdCrossed) {
     Last_EVENT_SYNC_TIME = currentTime;
   }
 
-  if (req.body.url) {
-    if (EVENTS_DATA[req.body.url] && !isSyncThresholdCrossed) {
-      returnEventIndexFromCurrentDate(EVENTS_DATA[req.body.url], req.body.date, function (index) {
-        if (index != -1) {
-          paginatedListOfEvents = EVENTS_DATA[req.body.url].slice(offset + index, (offset + index + limit));
-          res.send({
-            'statusCode': 200,
-            'events': paginatedListOfEvents,
-            'totalEvents': EVENTS_DATA[req.body.url].length - index
-          });
-        } else {
-          res.send({
-            'statusCode': 404,
-            'events': null,
-            'totalEvents': 0
+  let { url } = req.body
+  if (url[0] === "w") {
+    url = url.replace("webcal", "https");
+  }
+
+  if (url) {
+    request(url, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        var data = ical2json.convert(body);
+        let mergedEvents = mergeEvents(data);
+        if (mergedEvents.length) {
+          processData(mergedEvents, function (events) {
+            mergedEvents = events;
+            mergedEvents = mergedEvents.sort(function (a, b) {
+              return a.startDate - b.startDate;
+            });
+            EVENTS_DATA[url] = mergedEvents;
+            returnEventIndexFromCurrentDate(mergedEvents, req.body.date, function (index) {
+              if (index != -1) {
+                paginatedListOfEvents = mergedEvents.slice(offset + index, (offset + index + limit));
+                res.send({
+                  'statusCode': 200,
+                  'events': paginatedListOfEvents,
+                  'totalEvents': mergedEvents.length - index
+                });
+              } else {
+                res.send({
+                  'statusCode': 404,
+                  'events': null,
+                  'totalEvents': 0
+                });
+              }
+            });
           });
         }
-      });
-    }
-    else {
-      request(req.body.url, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-          var data = ical2json.convert(body);
-          if (data && data.VEVENT && data.VEVENT.length) {
-            var mergedEvents = data.VCALENDAR[0].VEVENT.concat(data.VEVENT);
-            processData(mergedEvents, function (events) {
-              mergedEvents = events;
-              mergedEvents = mergedEvents.sort(function (a, b) {
-                return a.startDate - b.startDate;
-              });
-              EVENTS_DATA[req.body.url] = mergedEvents;
-              returnEventIndexFromCurrentDate(mergedEvents, req.body.date, function (index) {
-                if (index != -1) {
-                  paginatedListOfEvents = mergedEvents.slice(offset + index, (offset + index + limit));
-                  res.send({
-                    'statusCode': 200,
-                    'events': paginatedListOfEvents,
-                    'totalEvents': mergedEvents.length - index
-                  });
-                } else {
-                  res.send({
-                    'statusCode': 404,
-                    'events': null,
-                    'totalEvents': 0
-                  });
-                }
-              });
-            });
-          }
-          else
-            res.send({'statusCode': 404, 'events': null});
-        } else
-          res.send({'statusCode': 500, 'events': null});
-      });
-    }
+        else
+          res.send({ 'statusCode': 404, 'events': null });
+      } else
+        res.send({ 'statusCode': response.statusCode, 'events': null });
+    });
+
   } else
-    res.send({'statusCode': 404, 'events': null});
+    res.send({ 'statusCode': 404, 'events': null });
 });
 
 
@@ -137,7 +128,7 @@ app.post('/event', function (req, res) {
   var index = req.body.index || 0;
   var isSyncThresholdCrossed = ((currentTime - Last_EVENT_SYNC_TIME) >= (1000 * 60 * 60 * 24));
 
-  if(isSyncThresholdCrossed) {
+  if (isSyncThresholdCrossed) {
     Last_EVENT_SYNC_TIME = currentTime;
   }
 
@@ -146,9 +137,9 @@ app.post('/event', function (req, res) {
       returnEventIndexFromCurrentDate(EVENTS_DATA[req.body.url], req.body.date, function (indexOfCurrentDateEvent) {
         if (index != -1) {
           var event = EVENTS_DATA[req.body.url][Number(index) + indexOfCurrentDateEvent];
-          res.send({'statusCode': 200, 'event': event});
+          res.send({ 'statusCode': 200, 'event': event });
         } else {
-          res.send({'statusCode': 404, 'event': null});
+          res.send({ 'statusCode': 404, 'event': null });
         }
       });
     }
@@ -167,21 +158,21 @@ app.post('/event', function (req, res) {
               returnEventIndexFromCurrentDate(mergedEvents, req.body.date, function (indexOfCurrentDateEvent) {
                 if (index != -1) {
                   var event = mergedEvents[Number(index) + indexOfCurrentDateEvent];
-                  res.send({'statusCode': 200, 'event': event});
+                  res.send({ 'statusCode': 200, 'event': event });
                 } else {
-                  res.send({'statusCode': 404, 'event': null});
+                  res.send({ 'statusCode': 404, 'event': null });
                 }
               });
             });
           }
           else
-            res.send({'statusCode': 404, 'event': null});
+            res.send({ 'statusCode': 404, 'event': null });
         } else
-          res.send({'statusCode': 500, 'event': null});
+          res.send({ 'statusCode': 500, 'event': null });
       });
     }
   } else
-    res.send({'statusCode': 404, 'event': null});
+    res.send({ 'statusCode': 404, 'event': null });
 });
 
 var server = app.listen(3020, function () {
@@ -213,6 +204,21 @@ function returnEventIndexFromCurrentDate(events, date, callback) {
   }, function () {
     callback(eventIndex);
   });
+}
+
+/**
+ * Function to merge events from data.VCALENDAR and data .VEVENT
+ * @param {Object} data ical data converted to JSON (using ical2json)
+ */
+function mergeEvents(data) {
+  let mergedEvents = [];
+  if (data && data.VCALENDAR && data.VCALENDAR[0] && data.VCALENDAR[0].VEVENT && data.VCALENDAR[0].VEVENT.length) {
+    mergedEvents = [...data.VCALENDAR[0].VEVENT]
+  }
+  if (data && data.VEVENT && data.VEVENT.length) {
+    mergedEvents = [...mergedEvents, ...data.VEVENT]
+  }
+  return mergedEvents;
 }
 
 

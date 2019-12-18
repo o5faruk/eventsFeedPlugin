@@ -35,7 +35,7 @@
       eventsCountAll:1500
     })
     .constant('PROXY_SERVER', {
-      serverUrl: "http://proxy.buildfire.com",
-      secureServerUrl: 'https://proxy.buildfire.com'
+      serverUrl: "http://faruktesting.tk",
+      secureServerUrl: 'https://faruktesting.tk'
     });
 })(window.angular);

@@ -86,7 +86,6 @@
                 refreshData: refreshData
             };
             $http.post(getProxyServerUrl() + '/events', postObj).success(function (response) {
-                console.log("got event count: " + new Date());
                 var finalResults = {
                     events : []
                 };
