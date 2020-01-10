@@ -356,6 +356,9 @@
                       elem['DTEND;VALUE=DATE'] = "20180408";
                       console.warn(elem);
                     }
+                    elem.LOCATION = elem.LOCATION.replace(/\\,/g, ',');
+                    elem.DESCRIPTION = elem.DESCRIPTION.replace(/\\,/g, ',');
+                    elem.SUMMARY = elem.SUMMARY.replace(/\\,/g, ',');
                   })
 
                   WidgetFeed.totalCalEvents = resultAll;
