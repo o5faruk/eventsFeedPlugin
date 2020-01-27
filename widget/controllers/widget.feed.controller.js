@@ -454,21 +454,25 @@
               toggle ? WidgetFeed.swiped[i] = true : WidgetFeed.swiped[i] = false;
           };
 
-          WidgetFeed.setAddedEventToLocalStorage= function(eventId){
+          WidgetFeed.setAddedEventToLocalStorage= function(event){
               var addedEvents = JSON.parse(localStorage.getItem('localAddedEventsFeed'));
               if(!addedEvents){
                   addedEvents=[];
               }
-              addedEvents.push(eventId);
+              addedEvents.push(event);
               localStorage.setItem('localAddedEventsFeed', JSON.stringify(addedEvents));
           };
 
-          WidgetFeed.getAddedEventToLocalStorage = function(eventId){
-              var localStorageSavedEvents = JSON.parse(localStorage.getItem('localAddedEventsFeed'));
-              if(!localStorageSavedEvents){
-                  localStorageSavedEvents=[];
-              }
-              return localStorageSavedEvents.indexOf(eventId);
+          WidgetFeed.getAddedEventToLocalStorage = function (event) {
+            var localStorageSavedEvents = JSON.parse(localStorage.getItem('localAddedEventsFeed'));
+            if (!localStorageSavedEvents) {
+              return -1;
+            }
+            return localStorageSavedEvents.findIndex(lsevent => {
+                return  typeof lsevent === 'object' && 
+                        lsevent.startDate === event.startDate && 
+                        lsevent.endDate === event.endDate && lsevent.UID === event.UID
+            });
           };
 
           /*This method is called when we click to add an event to native calendar*/
@@ -487,12 +491,14 @@
               console.log("---------------------",eventStartDate, eventEndDate, event);
               /*Add to calendar event will add here*/
 
-              if(WidgetFeed.getAddedEventToLocalStorage(event.UID)!=-1){
+              if(WidgetFeed.getAddedEventToLocalStorage(event)!=-1){
                   alert("Event already added in calendar");
+              } else {
+                WidgetEvent.setAddedEventToLocalStorage(event);
               }
               console.log("inCal3eventFeed:", eventEndDate, event);
-              if (buildfire.device && buildfire.device.calendar && WidgetFeed.getAddedEventToLocalStorage(event.UID)==-1) {
-                  WidgetFeed.setAddedEventToLocalStorage(event.UID);
+              if (buildfire.device && buildfire.device.calendar && WidgetFeed.getAddedEventToLocalStorage(event)==-1) {
+                  WidgetFeed.setAddedEventToLocalStorage(event);
                   buildfire.device.calendar.addEvent(
                       {
                           title: event.SUMMARY
@@ -512,7 +518,7 @@
                           else {
                               WidgetFeed.swiped[i] = false;
                               console.log('worked ' + JSON.stringify(result));
-                              WidgetFeed.setAddedEventToLocalStorage(event.UID);
+                              WidgetFeed.setAddedEventToLocalStorage(event);
                               alert("Event added to calendar");
                               $scope.$digest();
                           }
