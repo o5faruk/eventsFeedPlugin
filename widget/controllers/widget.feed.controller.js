@@ -60,22 +60,6 @@
                    ]
               }
           };
-          const getTimeFromTimeZone = (event,start) => {
-            try {
-                const keyWord = start ? "DTSTART;TZID":"DTEND;TZID";
-                let dtTZID = null;
-                Object.entries(event).forEach(([key, value]) => { if (key.indexOf(keyWord) >= 0) { dtTZID = key + ":" + value } });
-                if (dtTZID) {
-                    const dtStartTimeRaw = dtTZID.split(':')[1];
-                    const comps = /^(\d{4})(\d{2})(\d{2})(T)(\d{2})(\d{2})(\d{2})$/.exec(dtStartTimeRaw);
-                    const dtStartTimeString = comps[1] + '-' + comps[2] + '-' + comps[3] + " " + comps[5] + ':' + comps[6] + ':' + comps[7];
-                    return moment.tz(dtStartTimeString, dtTZID.split('"')[1]).local().toDate();
-                }
-            } catch (err) {
-                console.error(err)
-                return null;
-            }
-          };
          WidgetFeed.eventsAll = null;
           WidgetFeed.totalCalEvents = null;   //this is all the calendar events from the ics
           WidgetFeed.swiped = [];
@@ -222,7 +206,6 @@
 
               for (var i = 0; i < result.events.length; i++) {
                   result.events[i].formattedRule =  getFormatRepeatRule(result.events[i].RRULE);
-                  console.log(result.events[i].SUMMARY);
                   if (result.events[i].RRULE) {
                       var rruleSuffix = '';
 
@@ -258,9 +241,8 @@
                       var hour=parseInt(strDate.substr(9,2));
                       var minute=parseInt(strDate.substr(11,2));
                       var second=parseInt(strDate.substr(13,2));
-                      console.log(result.events[i].RRULE);
                       //make sure the start date is valid
-                      var dtStart = new Date(year,month-1 ,day, hour, minute, second);
+                      var dtStart = new Date(result.events[i].startDate) || new Date(year,month-1 ,day, hour, minute, second);
                       if ( dtStart == "Invalid Date" ) {
                           console.log("Invalid Start Date for :", result.events[i].SUMMARY)
                           continue;
@@ -294,12 +276,16 @@
 
                       var mTest = rruleSet.valueOf();
                       var dates =  rruleSet.between(startDate, endDate);
-                      console.log(mTest);
+                      const eventDuration = result.events[i].endDate - result.events[i].startDate;
+
                       //add repeating events to the result
                       for (var j = 0; j < dates.length; j++) {
                           var temp_result = JSON.parse(JSON.stringify(result.events[i]));
+                          
                           temp_result.tmpStartDate = temp_result.startDate;
                           temp_result.startDate = Date.parse(dates[j]);
+                          temp_result.endDate = temp_result.startDate + eventDuration;
+                          temp_result.UID = temp_result.UID + String(temp_result.startDate) + String(temp_result.endDate)
                           if (temp_result.startDate >= +new Date(eventStartDate) && temp_result.startDate <= +new Date(eventRecEndDate))
                               if (AllEvent)
                                   repeat_results.push(temp_result);
@@ -310,15 +296,6 @@
                   } else {
                       if(result.events[i].isAllDay && result.events[i]["DTSTART;VALUE=DATE"]) {
                         result.events[i].startDate = moment(result.events[i]["DTSTART;VALUE=DATE"], 'YYYYMMDD').toDate();
-                      }
-                      const startDateFromTimeZone = getTimeFromTimeZone(result.events[i],true);
-                      if(startDateFromTimeZone){
-                          result.events[i].startDate = startDateFromTimeZone;
-                      }
-
-                      const endDateFromTimeZone = getTimeFromTimeZone(result.events[i],false);
-                      if(endDateFromTimeZone){
-                          result.events[i].endDate = endDateFromTimeZone;
                       }
                     
                       if (result.events[i].startDate >= +new Date(eventStartDate) && result.events[i].startDate <= +new Date(eventRecEndDate)) {
@@ -349,7 +326,6 @@
           WidgetFeed.getAllEvents = function() {
               console.log("start getAllEvents: " + new Date());
               var successAll = function (resultAll) {
-                  console.log("#################", resultAll);
 
                   resultAll.events.forEach(elem => {
                     if (elem.SUMMARY === "Spring Break") {
@@ -370,12 +346,10 @@
                   WidgetFeed.events = resultAll;
 
                   $scope.$broadcast('refreshDatepickers');
-                  console.log("end getAllEvents: " + new Date());
               }, errorAll = function (errAll) {
                   WidgetFeed.eventsAll = [];
                   console.error('Error In Fetching events', errAll);
               };
-              console.log("##############", eventFromDate);
               CalenderFeedApi.getFeedEvents(WidgetFeed.data.content.feedUrl, eventFromDate, 0, true, 'ALL').then(successAll, errorAll);
           };
 
@@ -442,7 +416,6 @@
                   }
                   $scope.$broadcast('refreshDatepickers');
 
-                  console.log("WidgetFeed.events",WidgetFeed.events);
                   if (currentLayout && currentLayout != WidgetFeed.data.design.itemDetailsLayout){
                       if (WidgetFeed.events && WidgetFeed.events.length) {
                           Location.goTo("#/event/"+0);
@@ -487,13 +460,11 @@
               } else {
                   eventEndDate = new Date(event.endDate);
               }
-              console.log("---------------------",eventStartDate, eventEndDate, event);
               /*Add to calendar event will add here*/
 
               if(WidgetFeed.getAddedEventToLocalStorage(event.UID)!=-1){
                   alert("Event already added in calendar");
               }
-              console.log("inCal3eventFeed:", eventEndDate, event);
               if (buildfire.device && buildfire.device.calendar && WidgetFeed.getAddedEventToLocalStorage(event.UID)==-1) {
                   WidgetFeed.setAddedEventToLocalStorage(event.UID);
                   buildfire.device.calendar.addEvent(
