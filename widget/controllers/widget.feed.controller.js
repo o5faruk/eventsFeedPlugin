@@ -332,9 +332,9 @@
                       elem['DTEND;VALUE=DATE'] = "20180408";
                       console.warn(elem);
                     }
-                    elem.LOCATION = elem.LOCATION.replace(/\\,/g, ',');
-                    elem.DESCRIPTION = elem.DESCRIPTION.replace(/\\,/g, ',');
-                    elem.SUMMARY = elem.SUMMARY.replace(/\\,/g, ',');
+                    if(elem.LOCATION) elem.LOCATION = elem.LOCATION.replace(/\\,/g, ',');
+                    if(elem.DESCRIPTION) elem.DESCRIPTION = elem.DESCRIPTION.replace(/\\,/g, ',');
+                    if(elem.SUMMARY ) elem.SUMMARY = elem.SUMMARY.replace(/\\,/g, ',');
                   })
 
                   WidgetFeed.totalCalEvents = resultAll;
