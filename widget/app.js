@@ -1,6 +1,7 @@
 'use strict';
 
 (function (angular, buildfire) {
+  buildfire.appearance.titlebar.show();
   angular.module('eventsFeedPluginWidget', ['ngRoute', 'ngTouch', 'infinite-scroll', 'ui.bootstrap', 'ngAnimate'])
     .config(['$routeProvider', '$compileProvider', function ($routeProvider, $compileProvider) {
 
