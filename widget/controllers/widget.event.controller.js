@@ -69,8 +69,8 @@
         };
 
         WidgetEvent.setAddedEventToLocalStorage = function (eventId) {
-          var addedEvents = [];
-          addedEvents = JSON.parse(localStorage.getItem('localAddedEventsFeed'));
+          let localAddedEventsFeed = localStorage.getItem('localAddedEventsFeed');
+          var addedEvents = localAddedEventsFeed ? JSON.parse(localAddedEventsFeed) : [];
           if (!addedEvents) {
             addedEvents = [];
           }
@@ -79,8 +79,8 @@
         };
 
         WidgetEvent.getAddedEventToLocalStorage = function (eventId) {
-          var localStorageSavedEvents = [];
-          localStorageSavedEvents = JSON.parse(localStorage.getItem('localAddedEventsFeed'));
+          let localAddedEventsFeed = localStorage.getItem('localAddedEventsFeed');
+          var localStorageSavedEvents = localAddedEventsFeed ? JSON.parse(localAddedEventsFeed) : [];
           if (!localStorageSavedEvents) {
             localStorageSavedEvents = [];
           }
