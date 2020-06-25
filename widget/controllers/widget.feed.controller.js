@@ -307,6 +307,19 @@
                           }
                       }
 
+                      //Handle multi day events
+                      if(result.events[i].endDate - result.events[i].startDate > 86400000) {
+                        let startDate = + new Date(result.events[i].startDate);
+                        let endDate = + new Date(result.events[i].endDate);
+                        startDate += 86400000;
+                        while (startDate < endDate) {
+                            if (startDate >= +new Date(eventStartDate) && startDate <= +new Date(eventRecEndDate) && (AllEvent || startDate >= timeStampInMiliSec)) {
+                                repeat_results.push({...result.events[i], startDate: new Date(startDate), UID: "_id" + Date.now() + Math.random()});
+                            }    
+                            startDate += 86400000;
+                        }
+                      }
+
               }}
               //sort the list by start date
               repeat_results.sort(function (a, b) {

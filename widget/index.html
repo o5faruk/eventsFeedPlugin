@@ -69,7 +69,7 @@
                        ng-swipe-left="WidgetFeed.addEvents($event, $index, false)"
                        custom-class="getDayClass(date, mode)"
                        ng-class="{'active' : WidgetFeed.swiped[$index]}"
-                       ng-repeat="event in WidgetFeed.events">
+                       ng-repeat="event in WidgetFeed.events track by event.UID">
                     <div class="calendar-icon text-center bg-primary"
                          ng-click="WidgetFeed.addEventsToCalendar(event, $index)">
                       <span class="icon icon-calendar-check"></span>
